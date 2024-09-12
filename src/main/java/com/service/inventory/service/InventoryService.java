@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class InventoryService {
@@ -55,10 +57,24 @@ public class InventoryService {
 
     @Transactional
     public List<InventoryDto> updateInventory(List<InventoryDto> requestDtoList) {
-        List<InventoryDto> response = new ArrayList<>();
+
+        List<String> productIds = requestDtoList.stream()
+                .map(InventoryDto::productId)
+                .toList();
+
+        Map<String, Inventory> inventoryMap = inventoryRepository.findAllByProductIdIn(productIds)
+                .stream()
+                .collect(Collectors.toMap(Inventory::getProductId, inventory -> inventory));
+
+        List<Inventory> updatedInventories = new ArrayList<>();
+
         for (InventoryDto request : requestDtoList) {
 
-            Inventory inventory = getInventory(request.productId());
+            if (!inventoryMap.containsKey(request.productId())) {
+                throw new BusinessException(Constants.ErrorMessage.PRODUCT_NOT_FOUND_MSG, HttpStatus.BAD_REQUEST);
+            }
+
+            Inventory inventory = inventoryMap.get(request.productId());
             Long newQuantity = inventory.getQuantity() + request.quantity();
 
             if (newQuantity < 0) {
@@ -67,10 +83,14 @@ public class InventoryService {
 
             inventory.setQuantity(newQuantity);
 
-            inventory = inventoryRepository.save(inventory);
-
-            response.add(mapStructMapper.toInventoryDto(inventory));
+            updatedInventories.add(inventory);
         }
-        return response;
+
+        updatedInventories = inventoryRepository.saveAll(updatedInventories);
+
+        return updatedInventories
+                .stream()
+                .map(inventory -> new InventoryDto(inventory.getProductId(), inventory.getQuantity()))
+                .toList();
     }
 }
