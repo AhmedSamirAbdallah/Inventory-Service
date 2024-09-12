@@ -23,6 +23,14 @@ public class ApiResponse<T> {
                 .build();
     }
 
+    public static <T> ApiResponse<T> success(T payload, HttpStatus httpStatus) {
+        return ApiResponse.<T>builder()
+                .payload(payload)
+                .message(null)
+                .httpStatus(httpStatus)
+                .build();
+    }
+
     public static <T> ApiResponse<T> error(T payload, HttpStatus httpStatus) {
         return ApiResponse.<T>builder()
                 .payload(payload)

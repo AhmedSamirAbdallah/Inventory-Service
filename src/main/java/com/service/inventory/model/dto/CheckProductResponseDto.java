@@ -1,7 +1,7 @@
 package com.service.inventory.model.dto;
 
-public record InventoryRequestDto(
-        String productId,
+public record CheckProductResponseDto(
+        Boolean isAvailable,
         Long quantity
 ) {
 }

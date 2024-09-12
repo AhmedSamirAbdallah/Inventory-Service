@@ -24,5 +24,8 @@ public class Inventory {
     @Column(name = "quantity")
     private Long quantity;
 
+    @Column(name = "minimum_stock_level")
+    private Long minimumStockLevel;
+
 
 }
