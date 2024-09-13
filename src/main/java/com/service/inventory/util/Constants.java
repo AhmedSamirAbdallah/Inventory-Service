@@ -27,6 +27,12 @@ public class Constants {
         public static final String PRODUCT_UPDATED_EVENT = "product-updated-event";
         public static final String PRODUCT_DELETED_EVENT = "product-deleted-event";
 
+        public static final String ORDER_CREATED_EVENT = "order-created-event";
+        public static final String ORDER_UPDATED_EVENT = "order-updated-event";
+        public static final String ORDER_DELETED_EVENT = "order-deleted-event";
+        public static final String ORDER_CANCELED_EVENT = "order-canceled-event";
+
+
     }
 
 
