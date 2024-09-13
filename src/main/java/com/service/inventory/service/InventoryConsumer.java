@@ -74,8 +74,7 @@ public class InventoryConsumer {
 
     @KafkaListener(topics = Constants.KafkaTopics.ORDER_CANCELED_EVENT, groupId = "inventory-service")
     public void consumeOrderCanceledEvent(ConsumerRecord<String, Object> record) {
-        Map<String, Object> values = objectMapper.convertValue(record.value(), new TypeReference<Map<String, Object>>() {
-        });
+        Map<String, Object> values = objectMapper.convertValue(record.value(), new TypeReference<Map<String, Object>>() {});
 
         List<Map<String, Object>> orderItems = (List<Map<String, Object>>) values.get("orderItems");
 

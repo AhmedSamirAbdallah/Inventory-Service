@@ -2,8 +2,6 @@ package com.service.inventory.controller;
 
 import com.service.inventory.common.ApiResponse;
 import com.service.inventory.model.dto.InventoryDto;
-import jakarta.ws.rs.QueryParam;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,7 +15,7 @@ public interface InventoryControllerInterface {
     ApiResponse createInventoryForProduct(@RequestBody InventoryDto requestDto);
 
     @GetMapping(path = "/check")
-    ApiResponse checkProductAvailability(@QueryParam("productId") String productId, @QueryParam("quantity") Long quantity);
+    ApiResponse checkProductAvailability(@RequestParam("productId") String productId, @RequestParam("quantity") Long quantity);
 
 
     @PostMapping(path = "/update")
