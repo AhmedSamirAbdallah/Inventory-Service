@@ -20,6 +20,12 @@ public class Constants {
         public static final String INVENTORY_NOT_FOUND_MSG = "Inventory record for the requested product was not found.";
         public static final String NEGATIVE_QUANTITY = "Quantity cannot be negative.";
 
+    }
+
+    public static class KafkaTopics {
+        public static final String PRODUCT_CREATED_EVENT = "product-created-event";
+        public static final String PRODUCT_UPDATED_EVENT = "product-updated-event";
+        public static final String PRODUCT_DELETED_EVENT = "product-deleted-event";
 
     }
 
