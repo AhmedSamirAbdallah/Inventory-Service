@@ -35,5 +35,10 @@ public class Constants {
 
     }
 
+    public static Long parseLong(Object num) {
+        if (num == null) return null;
+        return Long.valueOf((String) num);
+    }
+
 
 }

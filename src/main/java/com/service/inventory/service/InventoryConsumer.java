@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -32,7 +34,8 @@ public class InventoryConsumer {
     @KafkaListener(topics = Constants.KafkaTopics.PRODUCT_CREATED_EVENT, groupId = "inventory-service")
     public void consumeProductCreatedEvent(ConsumerRecord<String, Object> record) {
         try {
-            Map<String, Object> values = objectMapper.convertValue(record.value(), new TypeReference<Map<String, Object>>() {}); //Anonymous Subclass
+            Map<String, Object> values = objectMapper.convertValue(record.value(), new TypeReference<Map<String, Object>>() {
+            }); //Anonymous Subclass
             String id = (String) values.get("id");
 
             if (id.isEmpty()) {
@@ -48,6 +51,44 @@ public class InventoryConsumer {
         } catch (Exception ex) {
             logger.error("Unexpected error occurred while processing Kafka message: {}", record.value(), ex);
         }
+    }
+
+    @KafkaListener(topics = Constants.KafkaTopics.ORDER_CREATED_EVENT, groupId = "inventory-service")
+    public void consumeOrderCreatedEvent(ConsumerRecord<String, Object> record) {
+        Map<String, Object> values = objectMapper.convertValue(record.value(), new TypeReference<Map<String, Object>>() {
+        });
+
+        List<Map<String, Object>> orderItems = (List<Map<String, Object>>) values.get("orderItems");
+
+        List<InventoryDto> inventoryDtoList = new ArrayList<>();
+
+        for (Map<String, Object> orderItem : orderItems) {
+            String productId = (String) orderItem.get("productId");
+            Long quantity = Constants.parseLong(orderItem.get("quantity").toString());
+
+            inventoryDtoList.add(new InventoryDto(productId, -quantity));
+        }
+
+        inventoryService.updateInventory(inventoryDtoList);
+    }
+
+    @KafkaListener(topics = Constants.KafkaTopics.ORDER_CANCELED_EVENT, groupId = "inventory-service")
+    public void consumeOrderCanceledEvent(ConsumerRecord<String, Object> record) {
+        Map<String, Object> values = objectMapper.convertValue(record.value(), new TypeReference<Map<String, Object>>() {
+        });
+
+        List<Map<String, Object>> orderItems = (List<Map<String, Object>>) values.get("orderItems");
+
+        List<InventoryDto> inventoryDtoList = new ArrayList<>();
+
+        for (Map<String, Object> orderItem : orderItems) {
+            String productId = (String) orderItem.get("productId");
+            Long quantity = Constants.parseLong(orderItem.get("quantity").toString());
+
+            inventoryDtoList.add(new InventoryDto(productId, quantity));
+        }
+
+        inventoryService.updateInventory(inventoryDtoList);
     }
 
 }
